@@ -1,18 +1,29 @@
 <template>
-  <div class="w-full h-full border-r border-gray-300 py-4">
-    <n-menu :options="menuOptions" class="text-base" />
+  <div class="w-full h-full py-4 bg-[#18181c]">
+    <n-menu :options="menuOptions" :theme="darkTheme" class="text-base" />
   </div>
 </template>
 <script>
-import { defineComponent } from "vue";
-import { NMenu } from "naive-ui";
+import { defineComponent, h } from "vue";
+import { NMenu, darkTheme } from "naive-ui";
+import { RouterLink } from "vue-router";
 const menuOptions = [
   {
-    label: "Dashboard",
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: "dashboard",
+          },
+        },
+        { default: () => "Dashboard" }
+      ),
     key: "dashboard",
   },
   {
-    label: "Boid",
+    label: () =>
+      h(RouterLink, { to: { name: "boid" } }, { default: () => "Boid" }),
     key: "boid",
   },
   {
@@ -22,7 +33,7 @@ const menuOptions = [
 ];
 export default defineComponent({
   setup() {
-    return { menuOptions };
+    return { menuOptions, darkTheme };
   },
   components: { NMenu },
 });

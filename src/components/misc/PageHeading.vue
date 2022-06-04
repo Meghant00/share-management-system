@@ -1,11 +1,11 @@
 <template>
-  <page-heading pageName="Dashboard" />
+  <h2 class="text-3xl text-gray-700">{{ pageName }}</h2>
 </template>
 <script>
 import { defineComponent } from "vue";
-import PageHeading from "@/components/misc/PageHeading.vue";
+
 export default defineComponent({
   setup() {},
-  components: { PageHeading },
+  props: { pageName: { type: String } },
 });
 </script>
