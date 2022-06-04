@@ -5,6 +5,7 @@
     size="large"
     :bordered="true"
     :pagination="pagination"
+    striped
   />
 </template>
 <script>

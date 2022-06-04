@@ -2,8 +2,10 @@
   <data-table :columns="columns" :data="data" />
 </template>
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import DataTable from "@/components/datatable/DataTable.vue";
+import { getAllBoid } from "@/services/boid/BoidServices";
+
 const createColumns = () => {
   return [
     {
@@ -22,13 +24,17 @@ const createColumns = () => {
 };
 export default defineComponent({
   setup() {
-    const data = [
-      { sn: 1, boid: 3208 },
-      { sn: 2, boid: 52818 },
-      { sn: 3, boid: 15658 },
-    ];
+    const data = ref([]);
     return { columns: createColumns(), data };
   },
   components: { DataTable },
+  async mounted() {
+    const res = await getAllBoid();
+    let sn = 1;
+    res.map((boid) => {
+      this.data.push({ sn: sn, boid: boid.boid, id: boid.id });
+      sn++;
+    });
+  },
 });
 </script>
