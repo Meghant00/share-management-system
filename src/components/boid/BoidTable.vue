@@ -2,7 +2,12 @@
   <div class="flex flex-row items-center justify-end py-4">
     <primary-button @click="showModal = true"> Add New Boid </primary-button>
   </div>
-  <data-table :columns="columns" :data="data" />
+  <data-table
+    :columns="columns"
+    :data="filteredData"
+    @search="search"
+    :tableLoading="tableLoading"
+  />
   <n-modal v-model:show="showModal">
     <add-boid @close="showModal = false" @addClicked="addClicked" />
   </n-modal>
@@ -79,21 +84,26 @@ const createColumns = ({ deleteClicked, editClicked }) => {
     },
   ];
 };
-
+const tableLoading = ref(true);
 const data = ref([]);
+const filteredData = ref([]);
 let sn = 1;
 const showModal = ref(false);
 const columns = createColumns({ deleteClicked, editClicked });
 const message = useMessage();
 const mapBoid = async () => {
   data.value = [];
+  filteredData.value = [];
   sn = 1;
+  tableLoading.value = true;
   const res = await getAllBoid();
 
   res.map((boid) => {
     data.value.push({ sn: sn, boid: boid.boid, id: boid.id });
     sn++;
   });
+  filteredData.value = data.value;
+  tableLoading.value = false;
 };
 onMounted(async () => {
   await mapBoid();
@@ -133,5 +143,13 @@ const updateBoid = async (boid) => {
   } catch (error) {
     message.error(error);
   }
+};
+
+const search = (searchValue) => {
+  tableLoading.value = true;
+  filteredData.value = data.value.filter((boid) =>
+    boid.boid.toString().includes(searchValue)
+  );
+  tableLoading.value = false;
 };
 </script>
