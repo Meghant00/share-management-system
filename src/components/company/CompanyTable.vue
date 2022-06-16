@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row items-center justify-end py-4">
-    <primary-button @click="showModal = true"> Add New Boid </primary-button>
+    <primary-button @click="showModal = true"> Add New Company </primary-button>
   </div>
   <data-table
     :columns="columns"
@@ -9,46 +9,50 @@
     :tableLoading="tableLoading"
   />
   <n-modal v-model:show="showModal">
-    <add-boid @close="showModal = false" @addClicked="addClicked" />
+    <add-company @close="showModal = false" @addClicked="addClicked" />
   </n-modal>
   <n-modal v-model:show="deleteModal">
-    <yes-no-popup @yesClicked="deleteBoidClicked" @close="deleteModal = false">
-      Do you want to delete this Boid?
+    <yes-no-popup
+      @close="deleteModal = false"
+      @yesClicked="deleteCompanyClicked"
+    >
+      Do you want to delete this Company?
     </yes-no-popup>
   </n-modal>
   <n-modal v-model:show="editModal">
-    <edit-boid
+    <edit-company
       @close="editModal = false"
-      :data="currentBoid"
-      @updateClicked="updateBoid"
+      :data="currentCompany"
+      @updateClicked="updateCompany"
     />
   </n-modal>
 </template>
 <script setup>
 import { h, onMounted, ref } from "vue";
 import DataTable from "@/components/datatable/DataTable.vue";
-import { getAllBoid } from "@/services/boid/BoidServices";
 import { NModal, useMessage } from "naive-ui";
 import PrimaryButton from "@/components/misc/PrimaryButton.vue";
-import AddBoid from "./AddBoid.vue";
-import {
-  addBoid,
-  deleteBoidService,
-  updateBoidService,
-} from "@/services/boid/BoidServices";
+import AddCompany from "./AddCompany.vue";
+
 import BoidActions from "./BoidActions.vue";
 import YesNoPopup from "@/components/misc/YesNoPopup.vue";
-import EditBoid from "./EditBoid.vue";
+import EditCompany from "./EditCompany.vue";
+import {
+  getAllCompany,
+  addCompany,
+  updateCompanyService,
+  deleteCompanyService,
+} from "@/services/company/CompanyServices";
 
-const currentBoid = ref(null);
+const currentCompany = ref(null);
 const deleteModal = ref(false);
 const editModal = ref(false);
 const deleteClicked = (row) => {
-  currentBoid.value = row;
+  currentCompany.value = row;
   deleteModal.value = true;
 };
 const editClicked = (row) => {
-  currentBoid.value = row;
+  currentCompany.value = row;
 
   editModal.value = true;
 };
@@ -61,8 +65,8 @@ const createColumns = ({ deleteClicked, editClicked }) => {
       sorter: "default",
     },
     {
-      key: "boid",
-      title: "Boid",
+      key: "companyName",
+      title: "Company Name",
       defaultSortOrder: false,
       sorter: "default",
     },
@@ -90,57 +94,61 @@ let sn = 1;
 const showModal = ref(false);
 const columns = createColumns({ deleteClicked, editClicked });
 const message = useMessage();
-const mapBoid = async () => {
+const mapCompany = async () => {
   data.value = [];
   filteredData.value = [];
   sn = 1;
   tableLoading.value = true;
-  const res = await getAllBoid();
+  const res = await getAllCompany();
 
-  res.map((boid) => {
-    data.value.push({ sn: sn, boid: boid.boid, id: boid.id });
+  res.map((company) => {
+    data.value.push({
+      sn: sn,
+      companyName: company.companyName,
+      id: company.id,
+    });
     sn++;
   });
   filteredData.value = data.value;
   tableLoading.value = false;
 };
 onMounted(async () => {
-  await mapBoid();
+  await mapCompany();
 });
-const addClicked = async (boid) => {
+const addClicked = async (companyName) => {
   try {
-    const res = await addBoid({ boid: boid });
-    await mapBoid();
+    const res = await addCompany({ companyName: companyName });
+    await mapCompany();
     sn++;
-    message.success("Boid Added");
+    message.success("Company Added");
     showModal.value = false;
   } catch (error) {
-    message.error("Boid Not Added");
+    message.error(error.response.data.message);
   }
 };
 
-const deleteBoidClicked = async () => {
+const deleteCompanyClicked = async () => {
   try {
-    const res = await deleteBoidService(currentBoid.value.id);
+    const res = await deleteCompanyService(currentCompany.value.id);
     filteredData.value = data.value.filter(
-      (boid) => boid.id !== currentBoid.value.id
+      (company) => company.id !== currentCompany.value.id
     );
-    currentBoid.value = null;
-    message.success("Boid Deleted Successfully");
+    currentCompany.value = null;
+    message.success("Company Deleted Successfully");
     deleteModal.value = false;
   } catch (error) {
     message.error(error);
   }
 };
-const updateBoid = async (boid) => {
+const updateCompany = async (companyName) => {
   try {
-    const tempData = { id: currentBoid.value.id, boid: boid };
-    const res = await updateBoidService(tempData);
+    const tempData = { id: currentCompany.value.id, companyName: companyName };
+    const res = await updateCompanyService(tempData);
 
-    currentBoid.value = null;
-    message.success("Boid Updated Successfully");
+    currentCompany.value = null;
+    message.success("Company Updated Successfully");
     editModal.value = false;
-    await mapBoid();
+    await mapCompany();
   } catch (error) {
     message.error(error);
   }
@@ -148,8 +156,8 @@ const updateBoid = async (boid) => {
 
 const search = (searchValue) => {
   tableLoading.value = true;
-  filteredData.value = data.value.filter((boid) =>
-    boid.boid.toString().includes(searchValue)
+  filteredData.value = data.value.filter((company) =>
+    company.companyName.includes(searchValue)
   );
   tableLoading.value = false;
 };

@@ -1,13 +1,13 @@
 <template>
   <n-card class="w-full md:w-1/2 lg:w-1/4" closable @close="close">
     <div class="flex flex-col items-start justify-start gap-8">
-      <h3 class="text-lg">Do you want to delete this Boid?</h3>
+      <h3 class="text-lg"><slot></slot></h3>
 
       <div class="flex flex-row items-center justify-end gap-8">
         <primary-button @click="yesClicked" class="!px-8" theme="green"
           >Yes</primary-button
         >
-        <primary-button @click="noClicked" class="!px-8" theme="red"
+        <primary-button @click="close" class="!px-8" theme="red"
           >No</primary-button
         >
       </div>
@@ -23,9 +23,6 @@ const close = () => {
   emit("close");
 };
 
-const noClicked = () => {
-  emit("noClicked");
-};
 const yesClicked = () => {
   emit("yesClicked");
 };

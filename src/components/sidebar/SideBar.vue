@@ -1,12 +1,18 @@
 <template>
   <div class="w-full h-full py-4 bg-[#18181c]">
-    <n-menu :options="menuOptions" :theme="darkTheme" class="text-base" />
+    <n-menu
+      :value="activeKey"
+      :options="menuOptions"
+      :theme="darkTheme"
+      class="text-base"
+    />
   </div>
 </template>
 <script>
-import { defineComponent, h } from "vue";
+import { defineComponent, h, onMounted, onUpdated, ref } from "vue";
 import { NMenu, darkTheme } from "naive-ui";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
+import { computed } from "@vue/reactivity";
 const menuOptions = [
   {
     label: () =>
@@ -27,13 +33,18 @@ const menuOptions = [
     key: "boid",
   },
   {
-    label: "Company",
+    label: () =>
+      h(RouterLink, { to: { name: "company" } }, { default: () => "Company" }),
     key: "company",
   },
 ];
 export default defineComponent({
   setup() {
-    return { menuOptions, darkTheme };
+    const route = useRoute();
+    const activeKey = computed(() => {
+      return route.name;
+    });
+    return { menuOptions, darkTheme, activeKey };
   },
   components: { NMenu },
 });

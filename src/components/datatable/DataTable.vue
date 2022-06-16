@@ -11,7 +11,7 @@
       :columns="columns"
       :data="data"
       size="large"
-      :bordered="true"
+      :bordered="false"
       :pagination="pagination"
       :loading="tableLoading"
       striped
