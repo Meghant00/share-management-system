@@ -36,7 +36,7 @@ import {
   deleteBoidService,
   updateBoidService,
 } from "@/services/boid/BoidServices";
-import BoidActions from "./BoidActions.vue";
+import DataTableActions from "@/components/misc/DataTableActions.vue";
 import YesNoPopup from "@/components/misc/YesNoPopup.vue";
 import EditBoid from "./EditBoid.vue";
 
@@ -71,7 +71,7 @@ const createColumns = ({ deleteClicked, editClicked }) => {
 
       title: "Actions",
       render(row) {
-        return h(BoidActions, {
+        return h(DataTableActions, {
           onDeleteClicked: () => {
             deleteClicked(row);
           },

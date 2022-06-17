@@ -37,6 +37,15 @@ const menuOptions = [
       h(RouterLink, { to: { name: "company" } }, { default: () => "Company" }),
     key: "company",
   },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        { to: { name: "transaction" } },
+        { default: () => "Transaction" }
+      ),
+    key: "transaction",
+  },
 ];
 export default defineComponent({
   setup() {

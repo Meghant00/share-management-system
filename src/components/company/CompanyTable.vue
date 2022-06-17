@@ -34,7 +34,7 @@ import { NModal, useMessage } from "naive-ui";
 import PrimaryButton from "@/components/misc/PrimaryButton.vue";
 import AddCompany from "./AddCompany.vue";
 
-import BoidActions from "./BoidActions.vue";
+import DataTableActions from "@/components/misc/DataTableActions.vue";
 import YesNoPopup from "@/components/misc/YesNoPopup.vue";
 import EditCompany from "./EditCompany.vue";
 import {
@@ -75,7 +75,7 @@ const createColumns = ({ deleteClicked, editClicked }) => {
 
       title: "Actions",
       render(row) {
-        return h(BoidActions, {
+        return h(DataTableActions, {
           onDeleteClicked: () => {
             deleteClicked(row);
           },
