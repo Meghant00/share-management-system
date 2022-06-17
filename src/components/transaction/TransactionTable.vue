@@ -15,6 +15,14 @@
       @editClicked="updateTransaction"
     />
   </n-modal>
+  <n-modal v-model:show="showDeleteModal">
+    <yes-no-popup
+      @close="showDeleteModal = false"
+      @yesClicked="deleteTransaction"
+    >
+      Do you want to delete this Transaction?
+    </yes-no-popup>
+  </n-modal>
 </template>
 <script>
 import { defineComponent, h, onMounted, ref } from "vue";
@@ -25,10 +33,12 @@ import {
   getAllTransactions,
   addTransaction,
   updateTransactionService,
+  deleteTransactionService,
 } from "@/services/transaction/TransactionServices.js";
 import { NModal, useMessage } from "naive-ui";
 import AddTransaction from "./AddTransaction.vue";
 import EditTransaction from "./EditTransaction.vue";
+import YesNoPopup from "@/components/misc/YesNoPopup.vue";
 export default defineComponent({
   name: "TransactionTable",
   components: {
@@ -37,6 +47,7 @@ export default defineComponent({
     DataTable,
     AddTransaction,
     EditTransaction,
+    YesNoPopup,
   },
   setup() {
     const createColumns = () => {
@@ -44,46 +55,62 @@ export default defineComponent({
         {
           key: "sn",
           title: "S.N",
+          width: 100,
+          sorter: "default",
         },
         {
           key: "boid",
           title: "Boid",
+          width: 100,
+          sorter: "default",
         },
         {
           key: "company",
           title: "Company",
+          width: 110,
+          sorter: "default",
         },
         {
           key: "transactionDate",
           title: "Transaction Date",
+          width: 170,
+          sorter: "default",
         },
         {
           key: "type",
           title: "Type",
+          width: 100,
         },
         {
           key: "noOfShare",
           title: "Number Of Share",
+          width: 170,
+          sorter: "default",
         },
         {
           key: "totalCostWacc",
           title: "Total Cost",
+          width: 100,
         },
         {
           key: "wacc",
           title: "WACC",
+          width: 100,
         },
         {
           key: "totalCost",
           title: "Total Cost",
+          width: 100,
         },
         {
           key: "wac",
           title: "WAC",
+          width: 100,
         },
         {
           key: "remarks",
           title: "Remarks",
+          width: 100,
         },
         {
           key: "actions",
@@ -98,6 +125,7 @@ export default defineComponent({
               },
             });
           },
+          width: 100,
         },
       ];
     };
@@ -178,11 +206,37 @@ export default defineComponent({
 
         message.success("Transaction Edited Successfully");
         showEditModal.value = false;
+        currentTransaction.value = null;
+
         await mapTransactions();
       } catch (error) {
-        console.log(error);
         message.error("Transaction Not Edited");
         showEditModal.value = false;
+      }
+    };
+
+    const showDeleteModal = ref(false);
+    const deleteClicked = (row) => {
+      currentTransaction.value = row;
+      showDeleteModal.value = true;
+    };
+
+    const deleteTransaction = async () => {
+      try {
+        const res = await deleteTransactionService(currentTransaction.value.id);
+
+        filteredData.value = data.value.filter(
+          (transaction) => transaction.id !== currentTransaction.value.id
+        );
+
+        message.success("Transaction Deleted Successfully");
+
+        showDeleteModal.value = false;
+
+        currentTransaction.value = null;
+      } catch (error) {
+        console.log(error);
+        message.error("Transaction Not Deleted");
       }
     };
 
@@ -195,6 +249,8 @@ export default defineComponent({
       showEditModal,
       currentTransaction,
       updateTransaction,
+      showDeleteModal,
+      deleteTransaction,
     };
   },
 });

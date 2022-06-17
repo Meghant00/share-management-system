@@ -1,7 +1,7 @@
 <template>
   <n-message-provider>
     <div class="flex flex-row items-start justify-start">
-      <div class="w-[15%] h-screen overflow-hidden">
+      <div class="w-[15%] h-screen overflow-hidden sticky top-0">
         <side-bar />
       </div>
       <div class="w-[85%] px-4 py-8 bg-gray-200 lg:min-h-screen">

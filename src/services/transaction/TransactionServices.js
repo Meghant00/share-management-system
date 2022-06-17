@@ -26,3 +26,11 @@ export async function updateTransactionService(transaction) {
 
   return res;
 }
+
+export async function deleteTransactionService(transactionId) {
+  const url = `/transaction/${transactionId}`;
+
+  const res = await publicRequest.delete(url);
+
+  return res;
+}
