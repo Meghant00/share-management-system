@@ -19,3 +19,10 @@ export async function addTransaction(transaction) {
 
   return res;
 }
+
+export async function updateTransactionService(transaction) {
+  const url = `/transaction/`;
+  const res = await publicRequest.put(url, transaction);
+
+  return res;
+}

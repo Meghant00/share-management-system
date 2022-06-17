@@ -94,7 +94,7 @@
           </n-form-item>
         </div>
       </div>
-      <primary-button @click="addClicked">Add Transaction</primary-button>
+      <primary-button @click="editClicked">Edit Transaction</primary-button>
     </n-form>
   </n-card>
 </template>
@@ -112,8 +112,9 @@ import PrimaryButton from "@/components/misc/PrimaryButton.vue";
 import { getAllBoid } from "@/services/boid/BoidServices";
 import { getAllCompany } from "@/services/company/CompanyServices";
 import { getShareTypes } from "@/services/transaction/TransactionServices";
+
 export default defineComponent({
-  name: "AddTransaction",
+  name: "EditTransaction",
   components: {
     NCard,
     NForm,
@@ -123,23 +124,29 @@ export default defineComponent({
     NDatePicker,
     PrimaryButton,
   },
-  emits: ["close", "addClicked"],
+  emits: ["close", "editClicked"],
+  props: { data: Object },
   setup(props, { emit }) {
     const boidOptions = ref([]);
     const companyOptions = ref([]);
     const shareTypeOptions = ref([]);
     const transactionFormRef = ref(null);
 
+    const getTransactionDate = () => {
+      return Date.parse(props.data.transactionDate);
+    };
+
     const transactionForm = ref({
       transactionData: {
-        boid: { boid: null },
-        company: { companyName: null },
-        transactionDate: null,
-        noOfShare: null,
-        purchasedPrice: null,
-        weightedPurchasedPrice: null,
-        type: null,
-        remarks: null,
+        id: props.data.id,
+        boid: { boid: props.data.boid },
+        company: { companyName: props.data.company },
+        transactionDate: getTransactionDate(),
+        noOfShare: props.data.noOfShare,
+        purchasedPrice: props.data.purchasedPrice,
+        weightedPurchasedPrice: props.data.weightedPurchasedPrice,
+        type: props.data.type,
+        remarks: props.data.remarks,
       },
     });
 
@@ -217,7 +224,7 @@ export default defineComponent({
       emit("close");
     };
 
-    const addClicked = () => {
+    const editClicked = () => {
       transactionFormRef.value
         .validate((error) => {
           if (!error) {
@@ -233,7 +240,7 @@ export default defineComponent({
               tempTransaction.weightedPurchasedPrice
             );
 
-            emit("addClicked", tempTransaction);
+            emit("editClicked", tempTransaction);
           }
         })
         .catch();
@@ -247,7 +254,7 @@ export default defineComponent({
       transactionForm,
       rules,
       close,
-      addClicked,
+      editClicked,
     };
   },
 });

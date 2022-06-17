@@ -8,6 +8,13 @@
   <n-modal v-model:show="showAddModal">
     <add-transaction @close="showAddModal = false" @addClicked="addClicked" />
   </n-modal>
+  <n-modal v-model:show="showEditModal">
+    <edit-transaction
+      :data="currentTransaction"
+      @close="showEditModal = false"
+      @editClicked="updateTransaction"
+    />
+  </n-modal>
 </template>
 <script>
 import { defineComponent, h, onMounted, ref } from "vue";
@@ -17,12 +24,20 @@ import DataTableActions from "@/components/misc/DataTableActions.vue";
 import {
   getAllTransactions,
   addTransaction,
+  updateTransactionService,
 } from "@/services/transaction/TransactionServices.js";
 import { NModal, useMessage } from "naive-ui";
 import AddTransaction from "./AddTransaction.vue";
+import EditTransaction from "./EditTransaction.vue";
 export default defineComponent({
   name: "TransactionTable",
-  components: { NModal, PrimaryButton, DataTable, AddTransaction },
+  components: {
+    NModal,
+    PrimaryButton,
+    DataTable,
+    AddTransaction,
+    EditTransaction,
+  },
   setup() {
     const createColumns = () => {
       return [
@@ -141,7 +156,46 @@ export default defineComponent({
       }
     };
 
-    return { columns, filteredData, showAddModal, addClicked, message };
+    const showEditModal = ref(false);
+    const currentTransaction = ref(null);
+
+    const editClicked = (row) => {
+      currentTransaction.value = row;
+
+      showEditModal.value = true;
+
+      currentTransaction.value.noOfShare =
+        currentTransaction.value.noOfShare.toString();
+      currentTransaction.value.purchasedPrice =
+        currentTransaction.value.purchasedPrice.toString();
+      currentTransaction.value.weightedPurchasedPrice =
+        currentTransaction.value.weightedPurchasedPrice.toString();
+    };
+
+    const updateTransaction = async (transaction) => {
+      try {
+        const res = await updateTransactionService(transaction);
+
+        message.success("Transaction Edited Successfully");
+        showEditModal.value = false;
+        await mapTransactions();
+      } catch (error) {
+        console.log(error);
+        message.error("Transaction Not Edited");
+        showEditModal.value = false;
+      }
+    };
+
+    return {
+      columns,
+      filteredData,
+      showAddModal,
+      addClicked,
+      message,
+      showEditModal,
+      currentTransaction,
+      updateTransaction,
+    };
   },
 });
 </script>
