@@ -46,6 +46,15 @@ const menuOptions = [
       ),
     key: "transaction",
   },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        { to: { name: "allsharecompanywise" } },
+        { default: () => "All Share Companywise" }
+      ),
+    key: "allsharecompanywise",
+  },
 ];
 export default defineComponent({
   setup() {

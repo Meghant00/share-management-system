@@ -56,12 +56,14 @@
           </n-form-item>
           <n-form-item
             label="Purchased Price"
-            path="transactionData.purchasedPrice"
+            path="transactionData.weightedPurchasedPrice"
           >
             <n-input
               placeholder="Purchased Price"
               clearable
-              v-model:value="transactionForm.transactionData.purchasedPrice"
+              v-model:value="
+                transactionForm.transactionData.weightedPurchasedPrice
+              "
             />
           </n-form-item>
         </div>
@@ -82,14 +84,12 @@
           </n-form-item>
           <n-form-item
             label="Purchased Price"
-            path="transactionData.weightedPurchasedPrice"
+            path="transactionData.purchasedPrice"
           >
             <n-input
               placeholder="Purchased Price"
               clearable
-              v-model:value="
-                transactionForm.transactionData.weightedPurchasedPrice
-              "
+              v-model:value="transactionForm.transactionData.purchasedPrice"
             />
           </n-form-item>
         </div>

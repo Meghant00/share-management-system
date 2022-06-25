@@ -4,7 +4,48 @@
       Add New Transaction
     </primary-button>
   </div>
-  <data-table :columns="columns" :data="filteredData" />
+  <data-table
+    :columns="columns"
+    :data="filteredData"
+    :tableLoading="tableIsLoading"
+    @search="searchFunction"
+    @resetClicked="resetClicked"
+  >
+    <template #filterParameters>
+      <n-select
+        placeholder="Select Boid"
+        :options="boidOptions"
+        clearable
+        filterable
+        v-model:value="boid"
+        @update:value="filterData"
+      />
+      <n-select
+        placeholder="Select Company"
+        :options="companyOptions"
+        clearable
+        filterable
+        v-model:value="company"
+        @update:value="filterData"
+      />
+      <n-select
+        placeholder="Select Type"
+        :options="typeOptions"
+        clearable
+        filterable
+        v-model:value="type"
+        @update:value="filterData"
+      />
+      <n-select
+        placeholder="Select Remarks"
+        :options="typeOptions"
+        clearable
+        filterable
+        v-model:value="remarks"
+        @update:value="filterData"
+      />
+    </template>
+  </data-table>
   <n-modal v-model:show="showAddModal">
     <add-transaction @close="showAddModal = false" @addClicked="addClicked" />
   </n-modal>
@@ -29,20 +70,25 @@ import { defineComponent, h, onMounted, ref } from "vue";
 import PrimaryButton from "@/components/misc/PrimaryButton.vue";
 import DataTable from "@/components/datatable/DataTable.vue";
 import DataTableActions from "@/components/misc/DataTableActions.vue";
+import { NSelect } from "naive-ui";
 import {
   getAllTransactions,
   addTransaction,
   updateTransactionService,
   deleteTransactionService,
+  getShareTypes,
 } from "@/services/transaction/TransactionServices.js";
 import { NModal, useMessage } from "naive-ui";
 import AddTransaction from "./AddTransaction.vue";
 import EditTransaction from "./EditTransaction.vue";
 import YesNoPopup from "@/components/misc/YesNoPopup.vue";
+import { getAllBoid } from "@/services/boid/BoidServices";
+import { getAllCompany } from "@/services/company/CompanyServices";
 export default defineComponent({
   name: "TransactionTable",
   components: {
     NModal,
+    NSelect,
     PrimaryButton,
     DataTable,
     AddTransaction,
@@ -50,6 +96,7 @@ export default defineComponent({
     YesNoPopup,
   },
   setup() {
+    const tableIsLoading = ref(true);
     const createColumns = () => {
       return [
         {
@@ -161,10 +208,48 @@ export default defineComponent({
         sn++;
       });
       filteredData.value = data.value;
+      tableIsLoading.value = false;
+    };
+
+    const boidOptions = ref([]);
+    const companyOptions = ref([]);
+    const typeOptions = ref([]);
+
+    const search = ref(null);
+    const boid = ref(null);
+    const company = ref(null);
+    const type = ref(null);
+    const remarks = ref(null);
+
+    const mapBoid = async () => {
+      const res = await getAllBoid();
+      res.map((boid) => {
+        boidOptions.value.push({ label: boid.boid, value: boid.boid });
+      });
+    };
+
+    const mapCompany = async () => {
+      const res = await getAllCompany();
+      res.map((company) => {
+        companyOptions.value.push({
+          label: company.companyName,
+          value: company.companyName,
+        });
+      });
+    };
+
+    const mapType = async () => {
+      const res = await getShareTypes();
+      res.map((type) => {
+        typeOptions.value.push({ label: type, value: type });
+      });
     };
 
     onMounted(async () => {
       await mapTransactions();
+      await mapBoid();
+      await mapCompany();
+      await mapType();
     });
 
     const columns = createColumns();
@@ -235,12 +320,49 @@ export default defineComponent({
 
         currentTransaction.value = null;
       } catch (error) {
-        console.log(error);
         message.error("Transaction Not Deleted");
       }
     };
 
+    const filterData = async () => {
+      tableIsLoading.value = true;
+      data.value = [];
+      filteredData.value = [];
+      await mapTransactions();
+      filteredData.value = await data.value.filter(transactionFilterLogic);
+      tableIsLoading.value = false;
+    };
+    const transactionFilterLogic = (transaction) => {
+      return (
+        (search.value
+          ? transaction.boid.toString().includes(search.value) ||
+            transaction.company
+              .toLowerCase()
+              .includes(search.value.toLowerCase())
+          : true) &&
+        (boid.value ? transaction.boid === boid.value : true) &&
+        (company.value ? transaction.company === company.value : true) &&
+        (type.value ? transaction.type === type.value : true) &&
+        (remarks.value ? transaction.remarks === remarks.value : true)
+      );
+    };
+
+    const searchFunction = (searchValue) => {
+      search.value = searchValue;
+      filterData();
+    };
+
+    const resetClicked = () => {
+      search.value = null;
+      boid.value = null;
+      company.value = null;
+      type.value = null;
+      remarks.value = null;
+
+      filterData();
+    };
     return {
+      tableIsLoading,
       columns,
       filteredData,
       showAddModal,
@@ -251,6 +373,17 @@ export default defineComponent({
       updateTransaction,
       showDeleteModal,
       deleteTransaction,
+      boidOptions,
+      companyOptions,
+      typeOptions,
+      search,
+      boid,
+      company,
+      type,
+      remarks,
+      filterData,
+      searchFunction,
+      resetClicked,
     };
   },
 });

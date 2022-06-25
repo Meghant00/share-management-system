@@ -34,3 +34,11 @@ export async function deleteTransactionService(transactionId) {
 
   return res;
 }
+
+export async function getAllShareCompanywise() {
+  const url = `/transaction/companywise-transaction`;
+
+  const res = await publicRequest.get(url);
+
+  return res.data;
+}

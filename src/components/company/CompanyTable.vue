@@ -157,7 +157,7 @@ const updateCompany = async (companyName) => {
 const search = (searchValue) => {
   tableLoading.value = true;
   filteredData.value = data.value.filter((company) =>
-    company.companyName.includes(searchValue)
+    company.companyName.toLowerCase().includes(searchValue.toLowerCase())
   );
   tableLoading.value = false;
 };
