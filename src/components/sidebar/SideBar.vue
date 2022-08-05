@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, h, onMounted, onUpdated, ref } from "vue";
+import { defineComponent, h } from "vue";
 import { NMenu, darkTheme } from "naive-ui";
 import { RouterLink, useRoute } from "vue-router";
 import { computed } from "@vue/reactivity";
@@ -54,6 +54,14 @@ const menuOptions = [
         { default: () => "All Share Companywise" }
       ),
     key: "allsharecompanywise",
+  },
+  {
+    label: "Reports",
+    key: "reports",
+    children: [
+      { label: "Boidwise Report", key: "boidwise-report" },
+      { label: "Boidwise Company List", key: "boidwise-company-report" },
+    ],
   },
 ];
 export default defineComponent({
